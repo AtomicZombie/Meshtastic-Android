@@ -3,7 +3,7 @@ package com.geeksville.mesh.ui
 import android.content.ActivityNotFoundException
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -15,11 +15,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.TextUnit
 import com.geeksville.mesh.Position
 import com.geeksville.mesh.R
 import com.geeksville.mesh.android.BuildUtils.debug
 import com.geeksville.mesh.ui.theme.AppTheme
-import com.geeksville.mesh.ui.theme.HyperlinkBlue
 import java.net.URLEncoder
 
 @Composable
@@ -32,8 +32,7 @@ fun LinkedCoordinates(
     if (position?.isValid() == true) {
         val uriHandler = LocalUriHandler.current
         val style = SpanStyle(
-            color = HyperlinkBlue,
-            fontSize = MaterialTheme.typography.button.fontSize,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textDecoration = TextDecoration.Underline
         )
         val name = nodeName ?: stringResource(id = R.string.unknown_username)

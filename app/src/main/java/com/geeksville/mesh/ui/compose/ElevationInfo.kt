@@ -1,7 +1,7 @@
 package com.geeksville.mesh.ui.compose
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
@@ -19,7 +19,7 @@ fun ElevationInfo(
 ) {
     val annotatedString = buildAnnotatedString {
         append(altitude.toString(system))
-        MaterialTheme.typography.overline.toSpanStyle().let { style ->
+        MaterialTheme.typography.labelMedium.toSpanStyle().let { style ->
             withStyle(style) {
                 append(" $suffix")
             }
@@ -28,7 +28,7 @@ fun ElevationInfo(
 
     Text(
         modifier = modifier,
-        fontSize = MaterialTheme.typography.button.fontSize,
+        style = MaterialTheme.typography.bodySmall,
         text = annotatedString,
     )
 }

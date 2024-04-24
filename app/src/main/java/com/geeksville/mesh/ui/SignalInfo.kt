@@ -1,7 +1,7 @@
 package com.geeksville.mesh.ui
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,8 +37,7 @@ fun signalInfo(
         Text(
             modifier = modifier,
             text = text,
-            color = MaterialTheme.colors.onSurface,
-            fontSize = MaterialTheme.typography.button.fontSize
+            style = MaterialTheme.typography.bodySmall
         )
         true
     } else {
