@@ -1,33 +1,24 @@
 package com.geeksville.mesh.ui
 
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.foundation.background
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirlineStops
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.SignalCellularAlt1Bar
 import androidx.compose.material.icons.filled.SignalCellularAlt2Bar
-import androidx.compose.material.icons.rounded.AirlineStops
-import androidx.compose.material.icons.rounded.WifiOff
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,38 +27,40 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathFillType
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.geeksville.mesh.NodeInfo
 import com.geeksville.mesh.R
+import com.geeksville.mesh.ui.components.NodeDetailsAppBar
 import com.geeksville.mesh.ui.preview.NodeInfoPreviewParameterProvider
 import com.geeksville.mesh.ui.theme.AppTheme
 import com.geeksville.mesh.util.formatAgo
 
 @Composable
+fun NodeDetailsView(thisNodeInfo: NodeInfo?, thatNodeInfo: NodeInfo) {
+    Column {
+        NodeDetailsAppBar()
+        NodeDetails(thisNodeInfo = thisNodeInfo, thatNodeInfo = thatNodeInfo)
+    }
+
+}
+
+@Composable
 fun NodeDetails(
-    thisNodeInfo: NodeInfo?,
-    thatNodeInfo: NodeInfo, modifier: Modifier = Modifier
+    thisNodeInfo: NodeInfo?, thatNodeInfo: NodeInfo, modifier: Modifier = Modifier
 ) {
 //TODO
 
     val unknownShortName = stringResource(id = R.string.unknown_node_short_name)
     val unknownLongName = stringResource(id = R.string.unknown_username)
 
-    Surface {
+    Surface() {
         Column(
             modifier = Modifier
                 .padding(20.dp)
@@ -78,22 +71,17 @@ fun NodeDetails(
                     Text(
                         text = formatAgo(thatNodeInfo.lastHeard),
                         fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelMedium
                     )
                     Text(
-                        text = thatNodeInfo.user?.longName ?: unknownShortName,
+                        text = thatNodeInfo.user?.longName ?: unknownLongName,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = "!db94Msj",
+                        text = thatNodeInfo.user?.hwModelString ?: "Unknown Hardware",
                         fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                    Text(
-                        text = thatNodeInfo.user?.hwModelString ?: "Unknown",
-                        fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
 
@@ -106,10 +94,14 @@ fun NodeDetails(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-BatteryInfo(modifier = Modifier,batteryLevel = thatNodeInfo.batteryLevel, voltage = thatNodeInfo.voltage)
+                    BatteryInfo(
+                        modifier = Modifier,
+                        batteryLevel = thatNodeInfo.batteryLevel,
+                        voltage = thatNodeInfo.voltage
+                    )
                     Text(
                         text = "Battery",
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
@@ -122,14 +114,28 @@ BatteryInfo(modifier = Modifier,batteryLevel = thatNodeInfo.batteryLevel, voltag
                     )
                     Text(
                         text = "Role",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                VerticalDivider(Modifier.height(25.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = thatNodeInfo.user?.id ?: "Unknown",
                         fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "User ID",
+                        fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
             }
             HorizontalDivider(
-                Modifier.padding(5.dp)
+                Modifier.padding(bottom = 10.dp)
             )
+            //TODO Add chips here for Trace route / Direct message / Request Position
 
             Column(
                 Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
@@ -137,11 +143,11 @@ BatteryInfo(modifier = Modifier,batteryLevel = thatNodeInfo.batteryLevel, voltag
                 InsightsView()
             }
             Column(
-                Modifier.padding(5.dp)
+                Modifier.padding(vertical = 15.dp)
             ) {
                 Text(
                     text = "Details",
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelLarge
                 )
 
@@ -149,53 +155,62 @@ BatteryInfo(modifier = Modifier,batteryLevel = thatNodeInfo.batteryLevel, voltag
             }
 
             LazyVerticalGrid(
-                columns = GridCells.Fixed(count = 2),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                columns = GridCells.Fixed(count = 3),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                item { MapView() }
-                item { SignalView() }
+                item { MapView(thatNodeInfo = thatNodeInfo, gpsFormat = 0) }
+                item {
+                    SignalView(
+                        rssi = thatNodeInfo.rssi,
+                        snr = thatNodeInfo.snr,
+                        hopsAway = thatNodeInfo.hopsAway
+                    )
+                }
+                item {
+                    ChUtilView()
+                }
             }
 
         }
-
     }
 }
 
 
 @Composable
 fun InsightsView() {
-    Card() {
-        Row(
-            Modifier.padding(
-                horizontal = 5.dp, vertical = 2.dp
-            ), verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Icons.Default.Info,
-                //tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = null
-            )
-            Text(
-
-                text = "This node has restarted 17 times in the past 12 hours.",
-                fontWeight = FontWeight.Normal,
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center
-            )
+    val hasInsight: Boolean = true
+    if (hasInsight) {
+        Card() {
+            Row(
+                Modifier.padding(
+                    horizontal = 5.dp, vertical = 2.dp
+                ), verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Outlined.Info, contentDescription = null
+                )
+                Text(
+                    text = "This node has restarted 17 times in the past 12 hours",
+                    fontWeight = FontWeight.Normal,
+                    style = MaterialTheme.typography.labelMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
+
 }
 
 @Composable
-fun MapView() {
+fun MapView(thatNodeInfo: NodeInfo, gpsFormat: Int) {
     Card() {
         Box(
             Modifier
-                .fillMaxSize()
                 .padding(10.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
             Column(
-                Modifier.align(Alignment.Center)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
                     Icons.Default.Map,
@@ -209,50 +224,161 @@ fun MapView() {
                     fontWeight = FontWeight.Normal,
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center
+
+                )
+                /// TODO: replace, is bad 
+                LinkedCoordinates(
+                    position = thatNodeInfo.position,
+                    format = gpsFormat,
+                    nodeName = thatNodeInfo.user?.longName ?: "unknownLongName"
                 )
             }
         }
     }
 }
+
 @Composable
-fun SignalView() {
+fun SignalView(rssi: Int, snr: Float, hopsAway: Int) {
+    val hopsAwayIcon = Icons.Default.AirlineStops
+    val signalText = "TODO"
+    val rssiIcon = when (rssi) {
+        in -200..-126 -> Icons.Default.SignalCellularAlt1Bar
+        in -125..-116 -> Icons.Default.SignalCellularAlt2Bar
+        in -115..0 -> Icons.Default.SignalCellularAlt
+        else -> Icons.Default.QuestionMark
+    }
     Card() {
         Box(
             Modifier
-                .fillMaxSize()
                 .padding(10.dp)
+                .align(Alignment.CenterHorizontally)
+
         ) {
-            Column(
-                Modifier.align(Alignment.Center)
-            ) {
+            Row(Modifier.align(Alignment.Center)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        if (hopsAway >= 1) {
+                            hopsAwayIcon
+                        } else {
+                            rssiIcon
+                        },
+                        contentDescription = null,
+                        Modifier
+                            .padding(5.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        text = if (hopsAway >= 1) {
+                            "Hops Away: $hopsAway"
+                        } else {
+                            signalText
+                        },
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Column(
+                    Modifier
+                        .padding(horizontal = 5.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Text(
+                        text = if (hopsAway == 0) {
+                            "RSSI:\n $rssi"
+                        } else {
+                            ""
+                        },
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Text(
+                        text = if (hopsAway == 0) {
+                            "SNR:\n $snr "
+                        } else {
+                            ""
+                        },
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChUtilView() {
+    Card {
+        Box(
+            Modifier
+                .padding(10.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
-                    Icons.Default.SignalCellularAlt,
+                    Icons.Default.DataUsage,
                     contentDescription = null,
                     Modifier
                         .padding(5.dp)
                         .align(Alignment.CenterHorizontally)
                 )
                 Text(
-                    text = "Signal Good",
+                    "Test",
                     fontWeight = FontWeight.Normal,
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center
                 )
             }
+
+
         }
     }
 }
 
-@Composable
 @Preview
-fun NodeDetailsPreview1() {
+@Composable
+fun FullNodeDetailsPage(){
     AppTheme {
         val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
-
         val thatNodeInfo = NodeInfoPreviewParameterProvider().values.last()
+        NodeDetailsView(thisNodeInfo =thisNodeInfo , thatNodeInfo =thatNodeInfo )
+    }
+
+}
+
+@Composable
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
+    device = "id:pixel_8"
+)
+fun NodeDetailsPreviewLight(
+    @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
+) {
+    AppTheme {
+        val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
         NodeDetails(
-            thatNodeInfo = thatNodeInfo,
-            thisNodeInfo = thisNodeInfo
+            thatNodeInfo = thatNodeInfo, thisNodeInfo = thisNodeInfo
         )
     }
 }
+
+@Composable
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    device = "id:pixel_8"
+)
+fun NodeDetailsPreviewDark(
+    @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
+) {
+    AppTheme {
+        val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
+        NodeDetails(
+            thatNodeInfo = thatNodeInfo, thisNodeInfo = thisNodeInfo
+        )
+    }
+}
+
