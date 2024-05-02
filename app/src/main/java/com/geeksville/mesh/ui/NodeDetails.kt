@@ -1,6 +1,10 @@
 package com.geeksville.mesh.ui
 
 import android.content.res.Configuration
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,33 +31,70 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geeksville.mesh.NodeInfo
 import com.geeksville.mesh.R
+import com.geeksville.mesh.model.RadioConfigViewModel
 import com.geeksville.mesh.ui.components.NodeDetailsAppBar
 import com.geeksville.mesh.ui.preview.NodeInfoPreviewParameterProvider
 import com.geeksville.mesh.ui.theme.AppTheme
-import com.geeksville.mesh.util.formatAgo
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class NodeDetailsFragment : ScreenFragment("Node Details") {
+
+    private val model: RadioConfigViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        setFragmentResultListener("requestKey") { _, bundle ->
+            val destNum = bundle.getInt("destNum")
+            model.setDestNum(destNum)
+        }
+
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setBackgroundColor(ContextCompat.getColor(context, R.color.colorAdvancedBackground))
+            setContent {
+                val node by model.destNode.collectAsStateWithLifecycle()
+
+                AppTheme {
+                    NodeDetailsView(node = node)
+                }
+            }
+        }
+    }
+}
 
 @Composable
-fun NodeDetailsView(thisNodeInfo: NodeInfo?, thatNodeInfo: NodeInfo) {
+fun NodeDetailsView(node: NodeInfo?) {
     Column {
         NodeDetailsAppBar()
-        NodeDetails(thisNodeInfo = thisNodeInfo, thatNodeInfo = thatNodeInfo)
+        NodeDetails(node = node)
     }
 
 }
 
 @Composable
 fun NodeDetails(
-    thisNodeInfo: NodeInfo?, thatNodeInfo: NodeInfo, modifier: Modifier = Modifier
+    node: NodeInfo?, modifier: Modifier = Modifier
 ) {
 //TODO
 
@@ -69,17 +110,17 @@ fun NodeDetails(
             Row(verticalAlignment = Alignment.Bottom) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = formatAgo(thatNodeInfo.lastHeard),
+                        text ="Test", //formatAgo(node!!.lastHeard) ?: "Unknown",
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelMedium
                     )
                     Text(
-                        text = thatNodeInfo.user?.longName ?: unknownLongName,
+                        text = node?.user?.longName ?: unknownLongName,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = thatNodeInfo.user?.hwModelString ?: "Unknown Hardware",
+                        text = node?.user?.hwModelString ?: "Unknown Hardware",
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -96,8 +137,8 @@ fun NodeDetails(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     BatteryInfo(
                         modifier = Modifier,
-                        batteryLevel = thatNodeInfo.batteryLevel,
-                        voltage = thatNodeInfo.voltage
+                        batteryLevel = node?.batteryLevel,
+                        voltage = node?.voltage
                     )
                     Text(
                         text = "Battery",
@@ -121,7 +162,7 @@ fun NodeDetails(
                 VerticalDivider(Modifier.height(25.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = thatNodeInfo.user?.id ?: "Unknown",
+                        text = node?.user?.id ?: "Unknown",
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -158,13 +199,14 @@ fun NodeDetails(
                 columns = GridCells.Fixed(count = 3),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                item { MapView(thatNodeInfo = thatNodeInfo, gpsFormat = 0) }
+                item { //MapView(thatNodeInfo = node?  , gpsFormat = 0)
+                    }
                 item {
-                    SignalView(
-                        rssi = thatNodeInfo.rssi,
-                        snr = thatNodeInfo.snr,
-                        hopsAway = thatNodeInfo.hopsAway
-                    )
+                  //  SignalView(
+                  //      rssi = node?.rssi ?: 0,
+                  //      snr = node?.snr ?: 0,
+                  //      hopsAway = node?.hopsAway ?: 0
+                  //  )
                 }
                 item {
                     ChUtilView()
@@ -180,7 +222,7 @@ fun NodeDetails(
 fun InsightsView() {
     val hasInsight: Boolean = true
     if (hasInsight) {
-        Card() {
+
             Row(
                 Modifier.padding(
                     horizontal = 5.dp, vertical = 2.dp
@@ -196,7 +238,7 @@ fun InsightsView() {
                     textAlign = TextAlign.Center
                 )
             }
-        }
+
     }
 
 }
@@ -226,7 +268,7 @@ fun MapView(thatNodeInfo: NodeInfo, gpsFormat: Int) {
                     textAlign = TextAlign.Center
 
                 )
-                /// TODO: replace, is bad 
+                /// TODO: replace, is bad
                 LinkedCoordinates(
                     position = thatNodeInfo.position,
                     format = gpsFormat,
@@ -341,11 +383,11 @@ fun ChUtilView() {
 
 @Preview
 @Composable
-fun FullNodeDetailsPage(){
+fun FullNodeDetailsPage() {
     AppTheme {
-        val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
+        val node = NodeInfoPreviewParameterProvider().values.first()
         val thatNodeInfo = NodeInfoPreviewParameterProvider().values.last()
-        NodeDetailsView(thisNodeInfo =thisNodeInfo , thatNodeInfo =thatNodeInfo )
+        NodeDetailsView(node = node)
     }
 
 }
@@ -359,9 +401,9 @@ fun NodeDetailsPreviewLight(
     @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
 ) {
     AppTheme {
-        val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
+        val node = NodeInfoPreviewParameterProvider().values.first()
         NodeDetails(
-            thatNodeInfo = thatNodeInfo, thisNodeInfo = thisNodeInfo
+            node = node
         )
     }
 }
@@ -375,10 +417,9 @@ fun NodeDetailsPreviewDark(
     @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
 ) {
     AppTheme {
-        val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
+        val node = NodeInfoPreviewParameterProvider().values.first()
         NodeDetails(
-            thatNodeInfo = thatNodeInfo, thisNodeInfo = thisNodeInfo
+             node = node
         )
     }
 }
-

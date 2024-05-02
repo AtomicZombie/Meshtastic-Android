@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/group_remote">
         <item
-            android:id="@+id/nodeDetails"
+            android:id="@+id/node_details"
             android:title="Node Details"
             app:showAsAction="withText" />
         <item
