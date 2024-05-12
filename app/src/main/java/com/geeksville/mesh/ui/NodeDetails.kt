@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,6 +49,12 @@ import com.geeksville.mesh.ui.preview.NodeInfoPreviewParameterProvider
 import com.geeksville.mesh.ui.theme.AppTheme
 import com.geeksville.mesh.util.formatAgo
 import dagger.hilt.android.AndroidEntryPoint
+
+
+/* TODO move to own viewmodel
+*   move modules to own files
+*   follow details of rssi / snr so it's the same as the weather app (Day)
+* */
 
 @AndroidEntryPoint
 class NodeDetailsFragment : ScreenFragment("Node Details") {
@@ -254,7 +259,7 @@ fun MapCard(node: NodeInfo?, gpsFormat: Int) {
                 Modifier.align(Alignment.Center)
             ) {
                 Icon(
-                    Icons.Rounded.Map,
+                    painterResource(id =R.drawable.map),
                     contentDescription = null,
                     Modifier
                         .padding(5.dp)
