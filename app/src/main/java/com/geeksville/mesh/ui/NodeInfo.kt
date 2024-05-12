@@ -71,15 +71,13 @@ fun NodeInfo(
     val distance = thisNodeInfo?.distanceStr(thatNodeInfo, distanceUnits)
     val (textColor, nodeColor) = thatNodeInfo.colors
 
-    val highlight = MaterialTheme.colorScheme.primaryContainer
+    val highlight = Color(0x33FFFFFF)
     val bgColor by animateColorAsState(
-        targetValue = if (blinking) highlight else MaterialTheme.colorScheme.background,
+        targetValue = if (blinking) highlight else Color.Transparent,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = BLINK_DURATION,
-                easing = FastOutSlowInEasing
-            ),
-            repeatMode = RepeatMode.Reverse
+                durationMillis = BLINK_DURATION, easing = FastOutSlowInEasing
+            ), repeatMode = RepeatMode.Reverse
         )
     )
 
@@ -87,14 +85,13 @@ fun NodeInfo(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
-            .defaultMinSize(minHeight = 80.dp),
-        colors = CardDefaults.cardColors(
+            .defaultMinSize(minHeight = 80.dp), colors = CardDefaults.cardColors(
             containerColor = bgColor
         )
 
 
     ) {
-        Surface (
+        Surface(
             color = bgColor
 
         ) {
@@ -102,7 +99,6 @@ fun NodeInfo(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                //   .background(bgColor)
 
             ) {
                 val (chip, dist, name, pos, alt, sats, batt, heard, sig, env) = createRefs()
@@ -116,8 +112,7 @@ fun NodeInfo(
                         .constrainAs(chip) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
-                        }
-                ) {
+                        }) {
                     Button(
                         modifier = Modifier.width(72.dp),
                         onClick = onClicked,
@@ -130,7 +125,9 @@ fun NodeInfo(
                         content = {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
-                                text = ((thatNodeInfo.user?.shortName ?: unknownShortName).strikeIf(isIgnored)),
+                                text = ((thatNodeInfo.user?.shortName ?: unknownShortName).strikeIf(
+                                    isIgnored
+                                )),
                                 fontWeight = FontWeight.Normal,
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.labelSmall
@@ -184,16 +181,10 @@ fun NodeInfo(
                             bottomMargin = 4.dp
                         )
                         linkTo(
-                            start = name.start,
-                            end = barrierBattHeard,
-                            bias = 0F,
-                            endMargin = 8.dp
+                            start = name.start, end = barrierBattHeard, bias = 0F, endMargin = 8.dp
                         )
                         width = Dimension.preferredWrapContent
-                    },
-                    position = position,
-                    format = gpsFormat,
-                    nodeName = nodeName
+                    }, position = position, format = gpsFormat, nodeName = nodeName
                 )
 
                 val signalShown = signalInfo(
@@ -201,13 +192,12 @@ fun NodeInfo(
                         top.linkTo(sigBarrier, 4.dp)
                         bottom.linkTo(env.top, 4.dp)
                         end.linkTo(parent.end)
-                    },
-                    nodeInfo = thatNodeInfo,
-                    isThisNode = isThisNode
+                    }, nodeInfo = thatNodeInfo, isThisNode = isThisNode
                 )
 
                 if (position?.isValid() == true) {
-                    val system = ConfigProtos.Config.DisplayConfig.DisplayUnits.forNumber(distanceUnits)
+                    val system =
+                        ConfigProtos.Config.DisplayConfig.DisplayUnits.forNumber(distanceUnits)
                     val altitude = position.altitude.metersIn(system)
                     val elevationSuffix = stringResource(id = R.string.elevation_suffix)
 
@@ -224,10 +214,7 @@ fun NodeInfo(
                                 bias = 0F,
                             )
                             width = Dimension.preferredWrapContent
-                        },
-                        altitude = altitude,
-                        system = system,
-                        suffix = elevationSuffix
+                        }, altitude = altitude, system = system, suffix = elevationSuffix
                     )
 
                     SatelliteCountInfo(
@@ -240,8 +227,7 @@ fun NodeInfo(
                                 bias = 0F,
                             )
                             width = Dimension.preferredWrapContent
-                        },
-                        satCount = position.satellitesInView
+                        }, satCount = position.satellitesInView
                     )
                 }
 
@@ -249,21 +235,18 @@ fun NodeInfo(
                     modifier = Modifier.constrainAs(batt) {
                         top.linkTo(parent.top)
                         end.linkTo(parent.end)
-                    },
-                    batteryLevel = thatNodeInfo.batteryLevel,
-                    voltage = thatNodeInfo.voltage
+                    }, batteryLevel = thatNodeInfo.batteryLevel, voltage = thatNodeInfo.voltage
                 )
 
                 LastHeardInfo(
                     modifier = Modifier.constrainAs(heard) {
                         top.linkTo(batt.bottom, 4.dp)
                         end.linkTo(parent.end)
-                    },
-                    lastHeard = thatNodeInfo.lastHeard
+                    }, lastHeard = thatNodeInfo.lastHeard
                 )
 
-                val envMetrics = thatNodeInfo.environmentMetrics
-                    ?.getDisplayString(tempInFahrenheit) ?: ""
+                val envMetrics =
+                    thatNodeInfo.environmentMetrics?.getDisplayString(tempInFahrenheit) ?: ""
                 if (envMetrics.isNotBlank()) {
                     Text(
                         modifier = Modifier.constrainAs(env) {
@@ -273,9 +256,7 @@ fun NodeInfo(
                                 top.linkTo(pos.bottom, 4.dp)
                             }
                             end.linkTo(parent.end)
-                        },
-                        text = envMetrics,
-                        style = MaterialTheme.typography.bodySmall
+                        }, text = envMetrics, style = MaterialTheme.typography.bodySmall
 
                     )
                 }
@@ -286,15 +267,15 @@ fun NodeInfo(
 
 private fun String.strike() = AnnotatedString(
     this,
-    spanStyles = listOf(
+        spanStyles = listOf(
         AnnotatedString.Range(
-            SpanStyle(textDecoration = TextDecoration.LineThrough),
-            start = 0,
-            end = this.length
+            SpanStyle(textDecoration = TextDecoration.LineThrough), start = 0, end = this.length
         )
     )
 )
-private fun String.strikeIf(isIgnored: Boolean): AnnotatedString = if (isIgnored) strike() else AnnotatedString(this)
+
+private fun String.strikeIf(isIgnored: Boolean): AnnotatedString =
+    if (isIgnored) strike() else AnnotatedString(this)
 
 @Composable
 @Preview(showBackground = false)
@@ -303,11 +284,7 @@ fun NodeInfoSimplePreview() {
         val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
         val thatNodeInfo = NodeInfoPreviewParameterProvider().values.last()
         NodeInfo(
-            thisNodeInfo = thisNodeInfo,
-            thatNodeInfo = thatNodeInfo,
-            1,
-            0,
-            true
+            thisNodeInfo = thisNodeInfo, thatNodeInfo = thatNodeInfo, 1, 0, true
         )
     }
 }
@@ -318,17 +295,12 @@ fun NodeInfoSimplePreview() {
     uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
 )
 fun NodeInfoPreview(
-    @PreviewParameter(NodeInfoPreviewParameterProvider::class)
-    thatNodeInfo: NodeInfo
+    @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
 ) {
     AppTheme {
         val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
         NodeInfo(
-            thisNodeInfo,
-            thatNodeInfo,
-            0,
-            1,
-            true
+            thisNodeInfo, thatNodeInfo, 0, 1, true
         )
     }
 }
