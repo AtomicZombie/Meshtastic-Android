@@ -9,20 +9,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AirlineStops
-import androidx.compose.material.icons.filled.DataUsage
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.filled.SignalCellularAlt
-import androidx.compose.material.icons.filled.SignalCellularAlt1Bar
-import androidx.compose.material.icons.filled.SignalCellularAlt2Bar
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,11 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResultListener
@@ -52,6 +48,7 @@ import com.geeksville.mesh.model.RadioConfigViewModel
 import com.geeksville.mesh.ui.components.NodeDetailsAppBar
 import com.geeksville.mesh.ui.preview.NodeInfoPreviewParameterProvider
 import com.geeksville.mesh.ui.theme.AppTheme
+import com.geeksville.mesh.util.formatAgo
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,9 +57,7 @@ class NodeDetailsFragment : ScreenFragment("Node Details") {
     private val model: RadioConfigViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         setFragmentResultListener("requestKey") { _, bundle ->
             val destNum = bundle.getInt("destNum")
@@ -100,29 +95,20 @@ fun NodeDetails(
 
     val unknownShortName = stringResource(id = R.string.unknown_node_short_name)
     val unknownLongName = stringResource(id = R.string.unknown_username)
+    val lastHeard = node?.lastHeard ?: 0
 
     Surface() {
         Column(
             modifier = Modifier
                 .padding(20.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text ="Test", //formatAgo(node!!.lastHeard) ?: "Unknown",
-                        fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
                         text = node?.user?.longName ?: unknownLongName,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(
-                        text = node?.user?.hwModelString ?: "Unknown Hardware",
-                        fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.labelMedium
                     )
                 }
 
@@ -131,25 +117,13 @@ fun NodeDetails(
                 Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    BatteryInfo(
-                        modifier = Modifier,
-                        batteryLevel = node?.batteryLevel,
-                        voltage = node?.voltage
-                    )
-                    Text(
-                        text = "Battery",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                }
-                VerticalDivider(Modifier.height(25.dp))
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Client",
+                        text = "TODO",
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -172,6 +146,21 @@ fun NodeDetails(
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
+
+                VerticalDivider(Modifier.height(25.dp))
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = node?.user?.hwModelString ?: "Unknown Hardware",
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "HW Model",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
             }
             HorizontalDivider(
                 Modifier.padding(bottom = 10.dp)
@@ -184,35 +173,45 @@ fun NodeDetails(
                 InsightsView()
             }
             Column(
-                Modifier.padding(vertical = 15.dp)
+                Modifier.padding(vertical = 10.dp)
             ) {
                 Text(
                     text = "Details",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelLarge
                 )
-
-
+                Text(
+                    text = formatAgo(lastHeard),
+                    fontWeight = FontWeight.Normal,
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
 
             LazyVerticalGrid(
-                columns = GridCells.Fixed(count = 3),
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                columns = GridCells.Fixed(count = 2),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                item { //MapView(thatNodeInfo = node?  , gpsFormat = 0)
-                    }
                 item {
-                  //  SignalView(
-                  //      rssi = node?.rssi ?: 0,
-                  //      snr = node?.snr ?: 0,
-                  //      hopsAway = node?.hopsAway ?: 0
-                  //  )
+                    MapCard(node = node, gpsFormat = 0)
                 }
                 item {
-                    ChUtilView()
+                    SignalCard(
+                        rssi = node?.rssi ?: 0,
+                        snr = node?.snr ?: Float.MAX_VALUE,
+                        hopsAway = node?.hopsAway ?: 0
+                    )
+                }
+                item {
+                    ChUtilCard(node = node)
+                }
+                item {
+                    BatteryCard(node = node)
                 }
             }
+            Column(Modifier.weight(1f)) {
 
+            }
         }
     }
 }
@@ -220,101 +219,135 @@ fun NodeDetails(
 
 @Composable
 fun InsightsView() {
-    val hasInsight: Boolean = true
+    val hasInsight: Boolean = false
     if (hasInsight) {
 
-            Row(
-                Modifier.padding(
-                    horizontal = 5.dp, vertical = 2.dp
-                ), verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Outlined.Info, contentDescription = null
-                )
-                Text(
-                    text = "This node has restarted 17 times in the past 12 hours",
-                    fontWeight = FontWeight.Normal,
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center
-                )
-            }
+        Row(
+            Modifier.padding(
+                horizontal = 5.dp, vertical = 2.dp
+            ), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Outlined.Info, contentDescription = null, Modifier.padding(2.dp)
+            )
+            Text(
+                text = "This node has restarted 17 times in the past 12 hours",
+                fontWeight = FontWeight.Normal,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center
+            )
+        }
 
     }
 
 }
 
 @Composable
-fun MapView(thatNodeInfo: NodeInfo, gpsFormat: Int) {
-    Card() {
+fun MapCard(node: NodeInfo?, gpsFormat: Int) {
+    Card(Modifier.height(100.dp)) {
         Box(
             Modifier
                 .padding(10.dp)
-                .align(Alignment.CenterHorizontally)
+                .fillMaxSize()
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                Modifier.align(Alignment.Center)
             ) {
                 Icon(
-                    Icons.Default.Map,
+                    Icons.Rounded.Map,
                     contentDescription = null,
                     Modifier
                         .padding(5.dp)
                         .align(Alignment.CenterHorizontally)
                 )
-                Text(
-                    text = "3.6KM NW of you",
-                    fontWeight = FontWeight.Normal,
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center
-
-                )
-                /// TODO: replace, is bad
-                LinkedCoordinates(
-                    position = thatNodeInfo.position,
-                    format = gpsFormat,
-                    nodeName = thatNodeInfo.user?.longName ?: "unknownLongName"
-                )
+                if (node?.position != null) {
+                    LinkedCoordinates(
+                        position = node.position,
+                        format = gpsFormat,
+                        nodeName = node.user?.longName ?: "unknownLongName",
+                        style = MaterialTheme.typography.labelSmall.toSpanStyle()
+                    )
+                } else {
+                    Text(
+                        text = "No GPS Data",
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center)
+                }
             }
         }
     }
 }
 
 @Composable
-fun SignalView(rssi: Int, snr: Float, hopsAway: Int) {
-    val hopsAwayIcon = Icons.Default.AirlineStops
-    val signalText = "TODO"
-    val rssiIcon = when (rssi) {
-        in -200..-126 -> Icons.Default.SignalCellularAlt1Bar
-        in -125..-116 -> Icons.Default.SignalCellularAlt2Bar
-        in -115..0 -> Icons.Default.SignalCellularAlt
-        else -> Icons.Default.QuestionMark
+fun SignalCard(rssi: Int, snr: Float, hopsAway: Int) {
+    val hopsAwayIcon = painterResource(id = R.drawable.hops_away)
+    val rssiQuality = when (rssi) {
+        in -200..-126 -> "Bad"
+        in -125..-116 -> "Fair"
+        in -115..0 -> "Good"
+        else -> "Unknown"
     }
-    Card() {
-        Box(
-            Modifier
-                .padding(10.dp)
-                .align(Alignment.CenterHorizontally)
+    val snrQuality = when (snr) {
+        in -40f..-15f -> "Bad"
+        in -15f..-7f -> "Fair"
+        in -7f..20f -> "Good"
+        else -> "Unknown"
+    }
 
+    val rssiSnrResult = when {
+        rssiQuality == "Good" && snrQuality == "Good" -> "Good"
+        rssiQuality == "Good" && snrQuality == "Fair" -> "Fair"
+        rssiQuality == "Good" && snrQuality == "Bad" -> "Bad"
+        rssiQuality == "Fair" && snrQuality == "Good" -> "Fair"
+        rssiQuality == "Fair" && snrQuality == "Fair" -> "Fair"
+        rssiQuality == "Fair" && snrQuality == "Bad" -> "Bad"
+        rssiQuality == "Bad" && snrQuality == "Good" -> "Bad"
+        rssiQuality == "Bad" && snrQuality == "Fair" -> "Fair"
+        rssiQuality == "Bad" && snrQuality == "Bad" -> "Bad"
+        else -> "Unknown"
+
+    }
+
+    val rssiIcon = when (rssiSnrResult) {
+        "Bad" -> painterResource(id = R.drawable.signal_cellular_1_bar)
+        "Fair" -> painterResource(id = R.drawable.signal_cellular_3_bar)
+        "Good" -> painterResource(id = R.drawable.signal_cellular_4_bar)
+        else -> painterResource(id = R.drawable.question_mark)
+    }
+    Card(Modifier.height(100.dp)) {
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Row(Modifier.align(Alignment.Center)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (hopsAway >= 1) {
+                Column(Modifier.align(Alignment.CenterVertically)) {
                     Icon(
-                        if (hopsAway >= 1) {
-                            hopsAwayIcon
-                        } else {
-                            rssiIcon
-                        },
+                        hopsAwayIcon,
                         contentDescription = null,
                         Modifier
                             .padding(5.dp)
                             .align(Alignment.CenterHorizontally)
                     )
                     Text(
-                        text = if (hopsAway >= 1) {
-                            "Hops Away: $hopsAway"
-                        } else {
-                            signalText
-                        },
+                        text = "Hops Away: $hopsAway",
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else if (rssi != Int.MAX_VALUE) {
+                Column(Modifier.align(Alignment.CenterVertically)) {
+                    Icon(
+                        rssiIcon,
+                        contentDescription = null,
+                        Modifier
+                            .padding(5.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        text = rssiSnrResult,
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelMedium,
                         textAlign = TextAlign.Center
@@ -323,25 +356,34 @@ fun SignalView(rssi: Int, snr: Float, hopsAway: Int) {
                 Column(
                     Modifier
                         .padding(horizontal = 5.dp)
-                        .align(Alignment.CenterVertically)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = if (hopsAway == 0) {
-                            "RSSI:\n $rssi"
-                        } else {
-                            ""
-                        },
+                        text = "RSSI: ${rssi}dB ",
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelMedium,
                         textAlign = TextAlign.Center,
                     )
 
                     Text(
-                        text = if (hopsAway == 0) {
-                            "SNR:\n $snr "
-                        } else {
-                            ""
-                        },
+                        text = "SNR: ${snr}dB",
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                Column(Modifier.align(Alignment.CenterVertically)) {
+                    Icon(
+                        painterResource(id = R.drawable.question_mark),
+                        contentDescription = null,
+                        Modifier
+                            .padding(5.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        text = "No Signal Data",
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelMedium,
                         textAlign = TextAlign.Center
@@ -349,30 +391,76 @@ fun SignalView(rssi: Int, snr: Float, hopsAway: Int) {
                 }
             }
         }
+
     }
 }
 
 @Composable
-fun ChUtilView() {
-    Card {
+fun ChUtilCard(node: NodeInfo?) {
+    Card(Modifier.height(100.dp)) {
         Box(
             Modifier
                 .padding(10.dp)
                 .align(Alignment.CenterHorizontally)
+                .fillMaxSize()
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    Icons.Default.DataUsage,
-                    contentDescription = null,
-                    Modifier
-                        .padding(5.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-                Text(
-                    "Test",
-                    fontWeight = FontWeight.Normal,
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center
+            Column(
+                Modifier
+                    .padding(horizontal = 5.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (node?.deviceMetrics?.channelUtilization != null) {
+                    Text(
+                        text = String.format("Ch Util: %.1f%%", node.deviceMetrics?.channelUtilization),
+                        Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Text(
+                        text = String.format("Air Time: %.1f%%", node.deviceMetrics?.airUtilTx),
+                        Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    Icon(
+                        painterResource(id = R.drawable.question_mark),
+                        contentDescription = null,
+                        Modifier
+                            .padding(5.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        text = "No Ch Util Data",
+                        Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+
+        }
+    }
+}
+
+@Composable
+fun BatteryCard(node: NodeInfo?) {
+    Card(Modifier.height(100.dp)) {
+        Box(
+            Modifier
+                .padding(10.dp)
+                .align(Alignment.CenterHorizontally)
+                .fillMaxSize()
+        ) {
+            Column(Modifier.align(Alignment.Center)) {
+                BatteryInfo(
+                    modifier = Modifier, batteryLevel = node?.batteryLevel, voltage = node?.voltage
                 )
             }
 
@@ -397,9 +485,7 @@ fun FullNodeDetailsPage() {
     uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
     device = "id:pixel_8"
 )
-fun NodeDetailsPreviewLight(
-    @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
-) {
+fun NodeDetailsPreviewLight() {
     AppTheme {
         val node = NodeInfoPreviewParameterProvider().values.first()
         NodeDetails(
@@ -413,13 +499,11 @@ fun NodeDetailsPreviewLight(
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
     device = "id:pixel_8"
 )
-fun NodeDetailsPreviewDark(
-    @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
-) {
+fun NodeDetailsPreviewDark() {
     AppTheme {
         val node = NodeInfoPreviewParameterProvider().values.first()
         NodeDetails(
-             node = node
+            node = node
         )
     }
 }

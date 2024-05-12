@@ -9,13 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.TextUnit
 import com.geeksville.mesh.Position
 import com.geeksville.mesh.R
 import com.geeksville.mesh.android.BuildUtils.debug
@@ -27,14 +28,11 @@ fun LinkedCoordinates(
     modifier : Modifier = Modifier,
     position: Position?,
     format: Int,
-    nodeName: String?
+    nodeName: String?,
+    style: SpanStyle
 ) {
     if (position?.isValid() == true) {
         val uriHandler = LocalUriHandler.current
-        val style = SpanStyle(
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textDecoration = TextDecoration.Underline
-        )
         val name = nodeName ?: stringResource(id = R.string.unknown_username)
         val annotatedString = buildAnnotatedString {
             pushStringAnnotation(
@@ -50,6 +48,7 @@ fun LinkedCoordinates(
         }
         ClickableText(
             modifier = modifier,
+            style = TextStyle(textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSecondaryContainer),
             text = annotatedString,
             onClick = { offset ->
                 debug("Clicked on link")
@@ -76,7 +75,8 @@ fun LinkedCoordinatesSimplePreview() {
         LinkedCoordinates(
             position = Position(37.7749, -122.4194, 0),
             format = 1,
-            nodeName = "Test Node Name"
+            nodeName = "Test Node Name",
+            style = MaterialTheme.typography.labelMedium.toSpanStyle()
         )
     }
 }
@@ -91,7 +91,9 @@ fun LinkedCoordinatesPreview(
         LinkedCoordinates(
             position = Position(37.7749, -122.4194, 0),
             format = format,
-            nodeName = "Test Node Name"
+            nodeName = "Test Node Name",
+            style = SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textDecoration = TextDecoration.Underline)
         )
     }
 }
