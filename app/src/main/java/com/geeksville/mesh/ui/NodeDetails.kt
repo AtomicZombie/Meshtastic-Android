@@ -54,6 +54,9 @@ import dagger.hilt.android.AndroidEntryPoint
 /* TODO move to own viewmodel
 *   move modules to own files
 *   follow details of rssi / snr so it's the same as the weather app (Day)
+*   replace battery info with a nicer one
+*   fix back / ... buttons or remove them
+*   make node details viewable on own device
 * */
 
 @AndroidEntryPoint
