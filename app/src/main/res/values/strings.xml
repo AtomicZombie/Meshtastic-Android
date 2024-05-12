@@ -2,6 +2,8 @@
     // Language tags native names (not available via .getDisplayLanguage)
     <string name="fr_HT" translatable="false">Kreyòl ayisyen</string>
     <string name="pt_BR" translatable="false">Português do Brasil</string>
+    <string name="zh_CN" translatable="false">简体中文</string>
+    <string name="zh_TW" translatable="false">繁體中文</string>
 
     <string name="app_name" translatable="false">Meshtastic</string>
     <string name="sample_distance" translatable="false">2.13 km</string>
@@ -189,4 +191,9 @@
     <string name="error_duty_cycle">Duty Cycle limit reached. Cannot send messages right now, please try again later.</string>
     <string name="forget_node">Forget Node</string>
     <string name="forget_node_message">This node will be removed from your list until your node receives NodeInfo data from it again.</string>
+    <string name="mute">Mute</string>
+    <string name="mute_notifications">Mute notifications</string>
+    <string name="mute_8_hours">8 hours</string>
+    <string name="mute_1_week">1 week</string>
+    <string name="mute_always">Always</string>
 </resources>

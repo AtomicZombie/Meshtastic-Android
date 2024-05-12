@@ -115,6 +115,8 @@ class UIViewModel @Inject constructor(
     val bondedAddress get() = radioInterfaceService.getBondedDeviceAddress()
     val selectedBluetooth get() = radioInterfaceService.getDeviceAddress()?.getOrNull(0) == 'x'
 
+    val wantConfigState get() = radioConfigRepository.wantConfigState
+
     private val _packets = MutableStateFlow<List<Packet>>(emptyList())
     val packets: StateFlow<List<Packet>> = _packets
 
@@ -221,6 +223,12 @@ class UIViewModel @Inject constructor(
         }
         contacts + (placeholder - contacts.keys)
     }.asLiveData()
+
+    val contactSettings get() = packetRepository.getContactSettings()
+
+    fun setMuteUntil(contacts: List<String>, until: Long) = viewModelScope.launch(Dispatchers.IO) {
+        packetRepository.setMuteUntil(contacts, until)
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val waypoints: LiveData<Map<Int, Packet>> = _packets.mapLatest { list ->
