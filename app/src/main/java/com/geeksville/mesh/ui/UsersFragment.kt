@@ -126,6 +126,14 @@ class UsersFragment : ScreenFragment("Users"), Logging {
             }
             popup.setOnMenuItemClickListener { item: MenuItem ->
                 when (item.itemId) {
+                    R.id.node_details -> {
+                        debug("calling remote admin --> destNum: ${node.num.toUInt()}")
+                        setFragmentResult("requestKey", bundleOf("destNum" to node.num))
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.mainActivityLayout, NodeDetailsFragment())
+                            .addToBackStack(null)
+                            .commit()
+                    }
                     R.id.direct_message -> {
                         debug("calling MessagesFragment filter: ${node.channel}${user.id}")
                         model.setContactKey("${node.channel}${user.id}")
