@@ -179,7 +179,9 @@ fun NodeInfo(
                     },
                     position = position,
                     format = gpsFormat,
-                    nodeName = nodeName
+                    nodeName = nodeName,
+                    style = SpanStyle(color = Color.Cyan,
+                        textDecoration = TextDecoration.Underline)
                 )
 
                 val signalShown = signalInfo(
