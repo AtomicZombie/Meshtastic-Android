@@ -57,6 +57,8 @@ import dagger.hilt.android.AndroidEntryPoint
 *   replace battery info with a nicer one
 *   fix back / ... buttons or remove them
 *   make node details viewable on own device
+*   fair / bad etc. not centered.
+*   make text -> strings
 * */
 
 @AndroidEntryPoint
