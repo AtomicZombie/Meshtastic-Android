@@ -5,21 +5,20 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Card
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -45,7 +44,7 @@ import com.geeksville.mesh.ui.preview.NodeInfoPreviewParameterProvider
 import com.geeksville.mesh.ui.theme.AppTheme
 import com.geeksville.mesh.util.metersIn
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun NodeInfo(
     thisNodeInfo: NodeInfo?,
@@ -70,7 +69,7 @@ fun NodeInfo(
 
     val highlight = Color(0x33FFFFFF)
     val bgColor by animateColorAsState(
-        targetValue = if (blinking) highlight else Color.Transparent,
+        targetValue = if (blinking) highlight else MaterialTheme.colorScheme.background,
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = BLINK_DURATION,
@@ -84,13 +83,13 @@ fun NodeInfo(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
-            .defaultMinSize(minHeight = 80.dp)
+            .defaultMinSize(minHeight = 80.dp),
+        colors = CardDefaults.cardColors(containerColor = bgColor)
     ) {
         Surface {
             ConstraintLayout(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(bgColor)
                     .padding(8.dp)
             ) {
                 val (chip, dist, name, pos, alt, sats, batt, heard, sig, env) = createRefs()
@@ -106,20 +105,22 @@ fun NodeInfo(
                             start.linkTo(parent.start)
                         }
                 ) {
-                    Chip(
+                    Button(
                         modifier = Modifier.width(72.dp),
                         onClick = onClicked,
-                        colors = ChipDefaults.chipColors(
-                            backgroundColor = Color(nodeColor),
-                            contentColor = Color(textColor)
+                        colors = ButtonColors(
+                            containerColor = Color(nodeColor),
+                            contentColor = Color(textColor),
+                            disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.error
                         ),
                         content = {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = (thatNodeInfo.user?.shortName ?: unknownShortName).strikeIf(isIgnored),
                                 fontWeight = FontWeight.Normal,
-                                fontSize = MaterialTheme.typography.button.fontSize,
                                 textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.labelSmall
                             )
                         },
                     )
@@ -132,9 +133,8 @@ fun NodeInfo(
                             start.linkTo(chip.start)
                             end.linkTo(chip.end)
                         },
-                        text = distance,
-                        fontSize = MaterialTheme.typography.button.fontSize,
-                    )
+                        text = distance
+                        )
                 }
 
                 val style = if (nodeName == unknownLongName) {
@@ -266,8 +266,7 @@ fun NodeInfo(
                             end.linkTo(parent.end)
                         },
                         text = envMetrics,
-                        color = MaterialTheme.colors.onSurface,
-                        fontSize = MaterialTheme.typography.button.fontSize
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -309,8 +308,7 @@ fun NodeInfoSimplePreview() {
     uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
 )
 fun NodeInfoPreview(
-    @PreviewParameter(NodeInfoPreviewParameterProvider::class)
-    thatNodeInfo: NodeInfo
+    @PreviewParameter(NodeInfoPreviewParameterProvider::class) thatNodeInfo: NodeInfo
 ) {
     AppTheme {
         val thisNodeInfo = NodeInfoPreviewParameterProvider().values.first()
